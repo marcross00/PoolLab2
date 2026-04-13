@@ -1,24 +1,25 @@
 import Foundation
+import Combine
 import UserNotifications
 import CoreData
 
-@MainActor
 class ReminderManager: ObservableObject {
-    static let shared = ReminderManager()
+    @MainActor static let shared = ReminderManager()
     
-    @Published var authorizationStatus: UNAuthorizationStatus = .notDetermined
+    @Published @MainActor var authorizationStatus: UNAuthorizationStatus = .notDetermined
     
     private let notificationCenter = UNUserNotificationCenter.current()
     private let notificationTime = DateComponents(hour: 9, minute: 0) // 9:00 AM
     
     private init() {
-        Task {
+        Task { @MainActor in
             await checkAuthorizationStatus()
         }
     }
     
     // MARK: - Authorization
     
+    @MainActor
     func requestAuthorization() async -> Bool {
         do {
             let granted = try await notificationCenter.requestAuthorization(options: [.alert, .sound, .badge])
@@ -30,6 +31,7 @@ class ReminderManager: ObservableObject {
         }
     }
     
+    @MainActor
     func checkAuthorizationStatus() async {
         let settings = await notificationCenter.notificationSettings()
         authorizationStatus = settings.authorizationStatus

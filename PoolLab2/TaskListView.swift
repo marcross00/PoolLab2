@@ -1,9 +1,10 @@
 import SwiftUI
 import CoreData
+import UIKit
 
 struct TaskListView: View {
     @Environment(\.managedObjectContext) private var viewContext
-    @StateObject private var reminderManager = ReminderManager.shared
+    @ObservedObject private var reminderManager = ReminderManager.shared
     
     @FetchRequest(
         sortDescriptors: [
@@ -116,7 +117,7 @@ struct TaskListView: View {
 private struct TaskRowView: View {
     @ObservedObject var task: MaintenanceTask
     @Environment(\.managedObjectContext) private var viewContext
-    @StateObject private var reminderManager = ReminderManager.shared
+    @ObservedObject private var reminderManager = ReminderManager.shared
     
     private static let dateFormatter: DateFormatter = {
         let f = DateFormatter()
