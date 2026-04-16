@@ -1,4 +1,4 @@
-import CoreData
+public import CoreData
 
 @objc(PoolLog)
 public class PoolLog: NSManagedObject, Identifiable {

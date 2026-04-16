@@ -1,5 +1,5 @@
 import Foundation
-import CoreData
+public import CoreData
 
 @objc(MaintenanceTask)
 public class MaintenanceTask: NSManagedObject {

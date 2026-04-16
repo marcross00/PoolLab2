@@ -1,5 +1,6 @@
 import SwiftUI
 import Charts
+internal import CoreData
 
 /// Standalone analytics components that can be used independently
 /// or integrated into other views

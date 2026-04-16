@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+internal import CoreData
 import Charts
 
 // MARK: - Example 1: Basic Analytics View Usage
@@ -235,7 +236,7 @@ func generateSummaryReport(
     
     var chemicalTotals: [String: Double] = [:]
     for chemical in chemicals {
-        chemicalTotals[chemical.type, default: 0] += chemical.amount
+        chemicalTotals[chemical.type ?? "unknown", default: 0] += chemical.amount
     }
     
     let chemicalSummaries = chemicalTotals.map { type, amount in

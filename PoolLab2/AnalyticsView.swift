@@ -1,6 +1,6 @@
 import SwiftUI
 import Charts
-import CoreData
+internal import CoreData
 
 struct AnalyticsView: View {
     @Environment(\.managedObjectContext) private var viewContext

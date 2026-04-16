@@ -1,4 +1,5 @@
-import CoreData
+import Foundation
+public import CoreData
 
 @objc(ChemicalEntry)
 public class ChemicalEntry: NSManagedObject, Identifiable {

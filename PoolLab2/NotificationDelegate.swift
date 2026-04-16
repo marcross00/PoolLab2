@@ -1,6 +1,6 @@
 import Foundation
 import UserNotifications
-import CoreData
+internal import CoreData
 
 class NotificationDelegate: NSObject, UNUserNotificationCenterDelegate {
     let persistenceController: PersistenceController

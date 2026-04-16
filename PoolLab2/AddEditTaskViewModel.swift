@@ -1,6 +1,6 @@
 import Foundation
 import Combine
-import CoreData
+internal import CoreData
 
 @MainActor
 class AddEditTaskViewModel: ObservableObject {

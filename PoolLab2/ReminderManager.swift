@@ -1,7 +1,7 @@
 import Foundation
 import Combine
 import UserNotifications
-import CoreData
+internal import CoreData
 
 class ReminderManager: ObservableObject {
     @MainActor static let shared = ReminderManager()

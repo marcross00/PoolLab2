@@ -1,5 +1,5 @@
 import Foundation
-import CoreData
+internal import CoreData
 import UserNotifications
 
 // MARK: - Example: Creating a Maintenance Task
