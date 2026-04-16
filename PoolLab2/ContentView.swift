@@ -20,6 +20,11 @@ struct ContentView: View {
                 .tabItem {
                     Label("Analytics", systemImage: "chart.xyaxis.line")
                 }
+            
+            SettingsView()
+                .tabItem {
+                    Label("Settings", systemImage: "gearshape.fill")
+                }
         }
     }
 }

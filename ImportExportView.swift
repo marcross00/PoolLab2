@@ -1,4 +1,5 @@
 import SwiftUI
+import CoreData
 import UniformTypeIdentifiers
 
 /// Main view for importing and exporting pool data

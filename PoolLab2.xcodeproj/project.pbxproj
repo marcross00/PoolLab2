@@ -6,8 +6,29 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		FB838A6B2F90839900C94942 /* DataExportManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB838A6A2F90839800C94942 /* DataExportManager.swift */; };
+		FB838A6D2F9083BC00C94942 /* DataImportManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB838A6C2F9083BC00C94942 /* DataImportManager.swift */; };
+		FB838A6F2F9083EA00C94942 /* ImportExportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB838A6E2F9083EA00C94942 /* ImportExportView.swift */; };
+		FB838A712F90840200C94942 /* ImportExportQuickActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB838A702F90840200C94942 /* ImportExportQuickActions.swift */; };
+		FB838A732F90843500C94942 /* IMPORT_EXPORT_GUIDE.md in Resources */ = {isa = PBXBuildFile; fileRef = FB838A722F90843500C94942 /* IMPORT_EXPORT_GUIDE.md */; };
+		FB838A752F90845B00C94942 /* ImportExportIntegrationExamples.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB838A742F90845B00C94942 /* ImportExportIntegrationExamples.swift */; };
+		FB838A772F90848B00C94942 /* DataValidationUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB838A762F90848B00C94942 /* DataValidationUtilities.swift */; };
+		FB838A792F9084BF00C94942 /* QUICK_START_IMPORT_EXPORT.md in Resources */ = {isa = PBXBuildFile; fileRef = FB838A782F9084BF00C94942 /* QUICK_START_IMPORT_EXPORT.md */; };
+		FB838A7B2F9084EF00C94942 /* IMPORT_EXPORT_README.md in Resources */ = {isa = PBXBuildFile; fileRef = FB838A7A2F9084EF00C94942 /* IMPORT_EXPORT_README.md */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		FB4E20572F8B3E980015D127 /* PoolLab2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PoolLab2.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FB838A6A2F90839800C94942 /* DataExportManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataExportManager.swift; sourceTree = "<group>"; };
+		FB838A6C2F9083BC00C94942 /* DataImportManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImportManager.swift; sourceTree = "<group>"; };
+		FB838A6E2F9083EA00C94942 /* ImportExportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportExportView.swift; sourceTree = "<group>"; };
+		FB838A702F90840200C94942 /* ImportExportQuickActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportExportQuickActions.swift; sourceTree = "<group>"; };
+		FB838A722F90843500C94942 /* IMPORT_EXPORT_GUIDE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = IMPORT_EXPORT_GUIDE.md; sourceTree = "<group>"; };
+		FB838A742F90845B00C94942 /* ImportExportIntegrationExamples.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportExportIntegrationExamples.swift; sourceTree = "<group>"; };
+		FB838A762F90848B00C94942 /* DataValidationUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataValidationUtilities.swift; sourceTree = "<group>"; };
+		FB838A782F9084BF00C94942 /* QUICK_START_IMPORT_EXPORT.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = QUICK_START_IMPORT_EXPORT.md; sourceTree = "<group>"; };
+		FB838A7A2F9084EF00C94942 /* IMPORT_EXPORT_README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = IMPORT_EXPORT_README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -34,6 +55,15 @@
 			children = (
 				FB4E20592F8B3E980015D127 /* PoolLab2 */,
 				FB4E20582F8B3E980015D127 /* Products */,
+				FB838A6A2F90839800C94942 /* DataExportManager.swift */,
+				FB838A6C2F9083BC00C94942 /* DataImportManager.swift */,
+				FB838A6E2F9083EA00C94942 /* ImportExportView.swift */,
+				FB838A702F90840200C94942 /* ImportExportQuickActions.swift */,
+				FB838A722F90843500C94942 /* IMPORT_EXPORT_GUIDE.md */,
+				FB838A742F90845B00C94942 /* ImportExportIntegrationExamples.swift */,
+				FB838A762F90848B00C94942 /* DataValidationUtilities.swift */,
+				FB838A782F9084BF00C94942 /* QUICK_START_IMPORT_EXPORT.md */,
+				FB838A7A2F9084EF00C94942 /* IMPORT_EXPORT_README.md */,
 			);
 			sourceTree = "<group>";
 		};
@@ -109,6 +139,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FB838A732F90843500C94942 /* IMPORT_EXPORT_GUIDE.md in Resources */,
+				FB838A792F9084BF00C94942 /* QUICK_START_IMPORT_EXPORT.md in Resources */,
+				FB838A7B2F9084EF00C94942 /* IMPORT_EXPORT_README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -119,6 +152,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FB838A752F90845B00C94942 /* ImportExportIntegrationExamples.swift in Sources */,
+				FB838A6F2F9083EA00C94942 /* ImportExportView.swift in Sources */,
+				FB838A712F90840200C94942 /* ImportExportQuickActions.swift in Sources */,
+				FB838A6D2F9083BC00C94942 /* DataImportManager.swift in Sources */,
+				FB838A772F90848B00C94942 /* DataValidationUtilities.swift in Sources */,
+				FB838A6B2F90839900C94942 /* DataExportManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

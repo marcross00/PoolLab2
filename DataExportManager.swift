@@ -1,9 +1,9 @@
 import Foundation
+import Combine
 import CoreData
 import UniformTypeIdentifiers
 
 /// Manages export of pool data to various formats
-@MainActor
 class DataExportManager: ObservableObject {
     private let context: NSManagedObjectContext
     
@@ -53,8 +53,8 @@ class DataExportManager: ObservableObject {
         dateFormatter.dateStyle = .medium
         dateFormatter.timeStyle = .short
         
-        for log in logs.sorted(by: { ($0.date ?? .distantPast) < ($1.date ?? .distantPast) }) {
-            let dateStr = log.date.map { dateFormatter.string(from: $0) } ?? ""
+        for log in logs.sorted(by: { $0.date < $1.date }) {
+            let dateStr = dateFormatter.string(from: log.date)
             let notesStr = log.notes?.replacingOccurrences(of: ",", with: ";") ?? ""
             
             csv += "\(dateStr),\(log.ph),\(log.fc),\(log.ta),\(log.ch),\(log.cya),\(log.saltPpm),\"\(notesStr)\"\n"
@@ -77,10 +77,10 @@ class DataExportManager: ObservableObject {
         dateFormatter.dateStyle = .medium
         dateFormatter.timeStyle = .short
         
-        for entry in entries.sorted(by: { ($0.date ?? .distantPast) < ($1.date ?? .distantPast) }) {
-            let dateStr = entry.date.map { dateFormatter.string(from: $0) } ?? ""
-            let type = entry.type ?? "Unknown"
-            let unit = entry.unit ?? "oz"
+        for entry in entries.sorted(by: { $0.date < $1.date }) {
+            let dateStr = dateFormatter.string(from: entry.date)
+            let type = entry.type
+            let unit = entry.unit
             
             csv += "\(dateStr),\(type),\(entry.amount),\(unit)\n"
         }
@@ -94,7 +94,7 @@ class DataExportManager: ObservableObject {
     
     /// Exports maintenance tasks to CSV format
     func exportMaintenanceTasksToCSV() throws -> Data {
-        let tasks = try fetchAllMaintenanceTasks()
+        let tasks = try fetchAllMaintenanceTaskEntities()
         
         var csv = "Task Name,Interval (days),Last Completed,Next Due,Status,Notes\n"
         
@@ -118,6 +118,13 @@ class DataExportManager: ObservableObject {
     }
     
     // MARK: - Fetch Helpers
+    
+    private func fetchAllMaintenanceTaskEntities() throws -> [MaintenanceTask] {
+        let request: NSFetchRequest<MaintenanceTask> = MaintenanceTask.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \MaintenanceTask.name, ascending: true)]
+        
+        return try context.fetch(request)
+    }
     
     private func fetchAllPoolLogs() throws -> [PoolLogExportable] {
         let request: NSFetchRequest<PoolLog> = PoolLog.fetchRequest()

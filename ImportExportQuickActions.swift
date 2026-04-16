@@ -1,4 +1,6 @@
 import SwiftUI
+import CoreData
+import UniformTypeIdentifiers
 
 /// Compact import/export buttons for integration into existing views
 struct ImportExportQuickActions: View {
@@ -146,49 +148,6 @@ struct ImportExportQuickActions: View {
     }
 }
 
-// MARK: - Card Style Component
-
-struct ImportExportCard: View {
-    @Environment(\.managedObjectContext) private var context
-    @State private var showingFullView = false
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                Image(systemName: "arrow.up.arrow.down.circle.fill")
-                    .font(.title2)
-                    .foregroundStyle(.blue)
-                
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Backup & Restore")
-                        .font(.headline)
-                    
-                    Text("Export or import your pool data")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                
-                Spacer()
-                
-                Button {
-                    showingFullView = true
-                } label: {
-                    Image(systemName: "chevron.right")
-                        .foregroundStyle(.secondary)
-                }
-            }
-            
-            ImportExportQuickActions(context: context)
-        }
-        .padding()
-        .background(Color(.secondarySystemBackground))
-        .cornerRadius(12)
-        .sheet(isPresented: $showingFullView) {
-            ImportExportView(context: context)
-        }
-    }
-}
-
 // MARK: - Preview
 
 #Preview("Quick Actions") {
@@ -200,27 +159,4 @@ struct ImportExportCard: View {
     }
 }
 
-#Preview("Card Style") {
-    ScrollView {
-        VStack(spacing: 16) {
-            ImportExportCard(
-                context: PersistenceController.preview.container.viewContext
-            )
-            
-            // Example of integration with other settings
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Settings")
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .padding(.horizontal)
-                
-                ImportExportCard(
-                    context: PersistenceController.preview.container.viewContext
-                )
-                .padding(.horizontal)
-            }
-        }
-        .padding(.vertical)
-    }
-    .background(Color(.systemGroupedBackground))
-}
+

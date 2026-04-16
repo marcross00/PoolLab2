@@ -1,4 +1,5 @@
 import SwiftUI
+import CoreData
 
 // MARK: - Integration Examples
 
@@ -90,7 +91,7 @@ struct DashboardWithImportExport: View {
                 
                 // Analytics preview
                 if !poolLogs.isEmpty {
-                    DashboardAnalyticsView(logs: Array(poolLogs))
+                    SimpleDashboardPreview(logs: Array(poolLogs))
                         .padding(.horizontal)
                 }
             }
@@ -256,7 +257,7 @@ struct MainTabViewWithImportExport: View {
         TabView {
             // Dashboard Tab
             NavigationStack {
-                DashboardWithImportExport(context: context)
+                DashboardWithImportExport()
             }
             .tabItem {
                 Label("Home", systemImage: "house.fill")
@@ -264,7 +265,7 @@ struct MainTabViewWithImportExport: View {
             
             // Logs Tab
             NavigationStack {
-                LogsViewWithExportButton(context: context)
+                LogsViewWithExportButton()
             }
             .tabItem {
                 Label("Logs", systemImage: "list.bullet")
@@ -280,7 +281,7 @@ struct MainTabViewWithImportExport: View {
             
             // Settings Tab (with Import/Export)
             NavigationStack {
-                SettingsViewWithImportExport(context: context)
+                SettingsViewWithImportExport()
             }
             .tabItem {
                 Label("Settings", systemImage: "gearshape.fill")
@@ -320,6 +321,54 @@ struct LatestReadingsCard: View {
                         .fontWeight(.semibold)
                 }
             }
+        }
+        .padding()
+        .background(Color(.systemBackground))
+        .cornerRadius(12)
+    }
+}
+
+struct ImportExportCard: View {
+    let context: NSManagedObjectContext
+    @State private var showingImportExport = false
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Data Management")
+                .font(.headline)
+            
+            Text("Import or export your pool data")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+            
+            Button {
+                showingImportExport = true
+            } label: {
+                Label("Import & Export", systemImage: "arrow.up.arrow.down.circle")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+        }
+        .padding()
+        .background(Color(.systemBackground))
+        .cornerRadius(12)
+        .sheet(isPresented: $showingImportExport) {
+            ImportExportView(context: context)
+        }
+    }
+}
+
+struct SimpleDashboardPreview: View {
+    let logs: [PoolLog]
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Recent Trends")
+                .font(.headline)
+            
+            Text("\(logs.count) total logs")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
         }
         .padding()
         .background(Color(.systemBackground))
@@ -404,10 +453,12 @@ struct PoolLogRow: View {
 
 #Preview("Dashboard with Import/Export") {
     NavigationStack {
-        DashboardWithImportExport(context: PersistenceController.preview.container.viewContext)
+        DashboardWithImportExport()
+            .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
     }
 }
 
 #Preview("Main Tab View") {
-    MainTabViewWithImportExport(context: PersistenceController.preview.container.viewContext)
+    MainTabViewWithImportExport()
+        .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
 }

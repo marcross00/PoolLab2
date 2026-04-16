@@ -1,8 +1,8 @@
 import Foundation
 import CoreData
+import Combine
 
 /// Manages import of pool data from various formats
-@MainActor
 class DataImportManager: ObservableObject {
     private let context: NSManagedObjectContext
     

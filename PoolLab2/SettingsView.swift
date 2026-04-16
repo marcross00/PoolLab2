@@ -1,4 +1,5 @@
 import SwiftUI
+internal import CoreData
 
 struct SettingsView: View {
     @Environment(\.managedObjectContext) private var context
