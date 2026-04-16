@@ -1,0 +1,413 @@
+import SwiftUI
+
+// MARK: - Integration Examples
+
+/*
+ This file demonstrates how to integrate the Import/Export feature
+ into your existing pool tracking app.
+ */
+
+// MARK: - Example 1: Add to Settings/More Tab
+
+struct SettingsViewWithImportExport: View {
+    @Environment(\.managedObjectContext) private var context
+    @State private var showingImportExport = false
+    
+    var body: some View {
+        NavigationStack {
+            List {
+                // Account Section
+                Section("Account") {
+                    NavigationLink("Profile") {
+                        Text("Profile View")
+                    }
+                    NavigationLink("Preferences") {
+                        Text("Preferences View")
+                    }
+                }
+                
+                // Data Management Section
+                Section("Data Management") {
+                    // Option A: Navigate to full view
+                    NavigationLink("Import & Export") {
+                        ImportExportView(context: context)
+                    }
+                    
+                    // OR Option B: Present as sheet
+                    /*
+                    Button {
+                        showingImportExport = true
+                    } label: {
+                        Label("Import & Export", systemImage: "arrow.up.arrow.down.circle")
+                    }
+                    */
+                }
+                
+                // Other Sections
+                Section("About") {
+                    NavigationLink("Help") {
+                        Text("Help View")
+                    }
+                    NavigationLink("Privacy Policy") {
+                        Text("Privacy View")
+                    }
+                }
+            }
+            .navigationTitle("Settings")
+            .sheet(isPresented: $showingImportExport) {
+                ImportExportView(context: context)
+            }
+        }
+    }
+}
+
+// MARK: - Example 2: Add to Dashboard/Home View
+
+struct DashboardWithImportExport: View {
+    @Environment(\.managedObjectContext) private var context
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \PoolLog.date, ascending: false)],
+        animation: .default
+    )
+    private var poolLogs: FetchedResults<PoolLog>
+    
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 16) {
+                // Latest readings card
+                if let latestLog = poolLogs.first {
+                    LatestReadingsCard(log: latestLog)
+                        .padding(.horizontal)
+                }
+                
+                // Quick actions
+                QuickActionsGrid(context: context)
+                    .padding(.horizontal)
+                
+                // Import/Export card
+                ImportExportCard(context: context)
+                    .padding(.horizontal)
+                
+                // Analytics preview
+                if !poolLogs.isEmpty {
+                    DashboardAnalyticsView(logs: Array(poolLogs))
+                        .padding(.horizontal)
+                }
+            }
+            .padding(.vertical)
+        }
+        .background(Color(.systemGroupedBackground))
+        .navigationTitle("Pool Overview")
+    }
+}
+
+// MARK: - Example 3: Toolbar Button
+
+struct LogsViewWithExportButton: View {
+    @Environment(\.managedObjectContext) private var context
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \PoolLog.date, ascending: false)],
+        animation: .default
+    )
+    private var poolLogs: FetchedResults<PoolLog>
+    
+    @State private var showingExport = false
+    @State private var exportData: Data?
+    @State private var showingShareSheet = false
+    
+    var body: some View {
+        List {
+            ForEach(poolLogs) { log in
+                PoolLogRow(log: log)
+            }
+        }
+        .navigationTitle("Pool Logs")
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Menu {
+                    Button {
+                        exportCurrentLogs()
+                    } label: {
+                        Label("Export Logs", systemImage: "square.and.arrow.up")
+                    }
+                    
+                    Button {
+                        showingExport = true
+                    } label: {
+                        Label("Import & Export", systemImage: "arrow.up.arrow.down.circle")
+                    }
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                }
+            }
+        }
+        .sheet(isPresented: $showingExport) {
+            ImportExportView(context: context)
+        }
+        .sheet(isPresented: $showingShareSheet) {
+            if let data = exportData {
+                ShareSheet(items: [createTemporaryFile(data: data)])
+            }
+        }
+    }
+    
+    private func exportCurrentLogs() {
+        let exportManager = DataExportManager(context: context)
+        
+        Task {
+            do {
+                let data = try await exportManager.exportPoolLogsToCSV()
+                await MainActor.run {
+                    exportData = data
+                    showingShareSheet = true
+                }
+            } catch {
+                print("Export failed: \(error)")
+            }
+        }
+    }
+    
+    private func createTemporaryFile(data: Data) -> URL {
+        let tempDir = FileManager.default.temporaryDirectory
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let dateString = dateFormatter.string(from: Date())
+        let fileURL = tempDir.appendingPathComponent("pool_logs_\(dateString).csv")
+        try? data.write(to: fileURL)
+        return fileURL
+    }
+}
+
+// MARK: - Example 4: Context Menu Integration
+
+struct LogDetailWithExport: View {
+    let log: PoolLog
+    @Environment(\.managedObjectContext) private var context
+    
+    @State private var showingExport = false
+    @State private var exportData: Data?
+    @State private var showingShareSheet = false
+    
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                // Log details
+                Text("pH: \(log.ph, specifier: "%.1f")")
+                Text("FC: \(log.fc, specifier: "%.1f") ppm")
+                // ... more details
+            }
+            .padding()
+        }
+        .navigationTitle("Log Details")
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    exportSingleLog()
+                } label: {
+                    Image(systemName: "square.and.arrow.up")
+                }
+            }
+        }
+        .sheet(isPresented: $showingShareSheet) {
+            if let data = exportData {
+                ShareSheet(items: [createTemporaryFile(data: data)])
+            }
+        }
+    }
+    
+    private func exportSingleLog() {
+        // Export just this log as JSON
+        let exportable = PoolLogExportable(
+            id: log.id ?? UUID(),
+            date: log.date ?? Date(),
+            ph: log.ph,
+            fc: log.fc,
+            ta: log.ta,
+            ch: log.ch,
+            cya: log.cya,
+            saltPpm: log.saltPpm,
+            notes: log.notes
+        )
+        
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        encoder.outputFormatting = [.prettyPrinted]
+        
+        if let data = try? encoder.encode([exportable]) {
+            exportData = data
+            showingShareSheet = true
+        }
+    }
+    
+    private func createTemporaryFile(data: Data) -> URL {
+        let tempDir = FileManager.default.temporaryDirectory
+        let fileURL = tempDir.appendingPathComponent("pool_log.json")
+        try? data.write(to: fileURL)
+        return fileURL
+    }
+}
+
+// MARK: - Example 5: Main Tab View Integration
+
+struct MainTabViewWithImportExport: View {
+    @Environment(\.managedObjectContext) private var context
+    
+    var body: some View {
+        TabView {
+            // Dashboard Tab
+            NavigationStack {
+                DashboardWithImportExport(context: context)
+            }
+            .tabItem {
+                Label("Home", systemImage: "house.fill")
+            }
+            
+            // Logs Tab
+            NavigationStack {
+                LogsViewWithExportButton(context: context)
+            }
+            .tabItem {
+                Label("Logs", systemImage: "list.bullet")
+            }
+            
+            // Analytics Tab
+            NavigationStack {
+                Text("Analytics View")
+            }
+            .tabItem {
+                Label("Analytics", systemImage: "chart.line.uptrend.xyaxis")
+            }
+            
+            // Settings Tab (with Import/Export)
+            NavigationStack {
+                SettingsViewWithImportExport(context: context)
+            }
+            .tabItem {
+                Label("Settings", systemImage: "gearshape.fill")
+            }
+        }
+    }
+}
+
+// MARK: - Supporting Views
+
+struct LatestReadingsCard: View {
+    let log: PoolLog
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Latest Reading")
+                .font(.headline)
+            
+            HStack {
+                VStack(alignment: .leading) {
+                    Text("pH")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Text("\(log.ph, specifier: "%.1f")")
+                        .font(.title2)
+                        .fontWeight(.semibold)
+                }
+                
+                Spacer()
+                
+                VStack(alignment: .leading) {
+                    Text("FC")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Text("\(log.fc, specifier: "%.1f") ppm")
+                        .font(.title2)
+                        .fontWeight(.semibold)
+                }
+            }
+        }
+        .padding()
+        .background(Color(.systemBackground))
+        .cornerRadius(12)
+    }
+}
+
+struct QuickActionsGrid: View {
+    let context: NSManagedObjectContext
+    
+    var body: some View {
+        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+            QuickActionButton(
+                title: "Add Log",
+                icon: "plus.circle.fill",
+                color: .blue
+            ) {
+                // Add log action
+            }
+            
+            QuickActionButton(
+                title: "Test Water",
+                icon: "drop.fill",
+                color: .cyan
+            ) {
+                // Test water action
+            }
+        }
+    }
+}
+
+struct QuickActionButton: View {
+    let title: String
+    let icon: String
+    let color: Color
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.title)
+                    .foregroundStyle(color)
+                
+                Text(title)
+                    .font(.caption)
+                    .foregroundStyle(.primary)
+            }
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(Color(.systemBackground))
+            .cornerRadius(12)
+        }
+    }
+}
+
+struct PoolLogRow: View {
+    let log: PoolLog
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text(log.date ?? Date(), style: .date)
+                .font(.headline)
+            
+            HStack {
+                Text("pH: \(log.ph, specifier: "%.1f")")
+                Spacer()
+                Text("FC: \(log.fc, specifier: "%.1f")")
+            }
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
+        }
+    }
+}
+
+// MARK: - Previews
+
+#Preview("Settings with Import/Export") {
+    SettingsViewWithImportExport()
+        .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+}
+
+#Preview("Dashboard with Import/Export") {
+    NavigationStack {
+        DashboardWithImportExport(context: PersistenceController.preview.container.viewContext)
+    }
+}
+
+#Preview("Main Tab View") {
+    MainTabViewWithImportExport(context: PersistenceController.preview.container.viewContext)
+}
