@@ -106,17 +106,18 @@ struct ComparisonChartView: View {
         logs.compactMap { log in
             guard let date = log.date else { return nil }
             
-            let value: Double
+            let value: Double?
             switch metric {
-            case .ph: value = log.ph
-            case .freeChlorine: value = log.fc
-            case .totalAlkalinity: value = log.ta
-            case .calciumHardness: value = log.ch
-            case .cya: value = log.cya
-            case .salt: value = log.saltPpm
+            case .ph: value = log.phValue
+            case .freeChlorine: value = log.fcValue
+            case .totalAlkalinity: value = log.taValue
+            case .calciumHardness: value = log.chValue
+            case .cya: value = log.cyaValue
+            case .salt: value = log.saltPpmValue
             }
             
-            return ChartDataPoint(date: date, value: value)
+            guard let unwrappedValue = value else { return nil }
+            return ChartDataPoint(date: date, value: unwrappedValue)
         }
     }
     

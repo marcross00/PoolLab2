@@ -31,12 +31,24 @@ final class AddEditLogViewModel {
         self.existingLog = log
 
         if let log {
-            ph = log.ph == 0 ? "" : String(log.ph)
-            fc = log.fc == 0 ? "" : String(log.fc)
-            ta = log.ta == 0 ? "" : String(log.ta)
-            ch = log.ch == 0 ? "" : String(log.ch)
-            cya = log.cya == 0 ? "" : String(log.cya)
-            saltPpm = log.saltPpm == 0 ? "" : String(log.saltPpm)
+            if let phValue = log.phValue {
+                ph = String(phValue)
+            }
+            if let fcValue = log.fcValue {
+                fc = String(fcValue)
+            }
+            if let taValue = log.taValue {
+                ta = String(taValue)
+            }
+            if let chValue = log.chValue {
+                ch = String(chValue)
+            }
+            if let cyaValue = log.cyaValue {
+                cya = String(cyaValue)
+            }
+            if let saltValue = log.saltPpmValue {
+                saltPpm = String(saltValue)
+            }
             notes = log.notes ?? ""
             date = log.wrappedDate
 
@@ -64,12 +76,12 @@ final class AddEditLogViewModel {
         }
 
         log.date = date
-        log.ph = Double(ph) ?? 0
-        log.fc = Double(fc) ?? 0
-        log.ta = Double(ta) ?? 0
-        log.ch = Double(ch) ?? 0
-        log.cya = Double(cya) ?? 0
-        log.saltPpm = Double(saltPpm) ?? 0
+        log.ph = Double(ph).map { NSNumber(value: $0) }
+        log.fc = Double(fc).map { NSNumber(value: $0) }
+        log.ta = Double(ta).map { NSNumber(value: $0) }
+        log.ch = Double(ch).map { NSNumber(value: $0) }
+        log.cya = Double(cya).map { NSNumber(value: $0) }
+        log.saltPpm = Double(saltPpm).map { NSNumber(value: $0) }
         log.notes = notes.isEmpty ? nil : notes
 
         // Remove existing chemicals when editing

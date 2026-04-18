@@ -233,12 +233,12 @@ class DataImportManager: ObservableObject {
         let log = PoolLog(context: context)
         log.id = newID
         log.date = data.date
-        log.ph = data.ph
-        log.fc = data.fc
-        log.ta = data.ta
-        log.ch = data.ch
-        log.cya = data.cya
-        log.saltPpm = data.saltPpm
+        log.ph = NSNumber(value: data.ph)
+        log.fc = NSNumber(value: data.fc)
+        log.ta = NSNumber(value: data.ta)
+        log.ch = NSNumber(value: data.ch)
+        log.cya = NSNumber(value: data.cya)
+        log.saltPpm = NSNumber(value: data.saltPpm)
         log.notes = data.notes
     }
     
@@ -265,12 +265,12 @@ class DataImportManager: ObservableObject {
     
     private func updatePoolLog(_ log: PoolLog, with data: PoolLogExportable) {
         log.date = data.date
-        log.ph = data.ph
-        log.fc = data.fc
-        log.ta = data.ta
-        log.ch = data.ch
-        log.cya = data.cya
-        log.saltPpm = data.saltPpm
+        log.ph = NSNumber(value: data.ph)
+        log.fc = NSNumber(value: data.fc)
+        log.ta = NSNumber(value: data.ta)
+        log.ch = NSNumber(value: data.ch)
+        log.cya = NSNumber(value: data.cya)
+        log.saltPpm = NSNumber(value: data.saltPpm)
         log.notes = data.notes
     }
     

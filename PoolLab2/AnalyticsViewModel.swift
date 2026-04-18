@@ -112,23 +112,24 @@ class AnalyticsViewModel: ObservableObject {
         chartData = poolLogs.compactMap { log in
             guard let date = log.date else { return nil }
             
-            let value: Double
+            let value: Double?
             switch selectedMetric {
             case .ph:
-                value = log.ph
+                value = log.phValue
             case .freeChlorine:
-                value = log.fc
+                value = log.fcValue
             case .totalAlkalinity:
-                value = log.ta
+                value = log.taValue
             case .calciumHardness:
-                value = log.ch
+                value = log.chValue
             case .cya:
-                value = log.cya
+                value = log.cyaValue
             case .salt:
-                value = log.saltPpm
+                value = log.saltPpmValue
             }
             
-            return ChartDataPoint(date: date, value: value)
+            guard let unwrappedValue = value else { return nil }
+            return ChartDataPoint(date: date, value: unwrappedValue)
         }
     }
     

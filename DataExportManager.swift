@@ -136,12 +136,12 @@ class DataExportManager: ObservableObject {
             PoolLogExportable(
                 id: log.id ?? UUID(),
                 date: log.date ?? Date(),
-                ph: log.ph,
-                fc: log.fc,
-                ta: log.ta,
-                ch: log.ch,
-                cya: log.cya,
-                saltPpm: log.saltPpm,
+                ph: log.ph?.doubleValue ?? 0.0,
+                fc: log.fc?.doubleValue ?? 0.0,
+                ta: log.ta?.doubleValue ?? 0.0,
+                ch: log.ch?.doubleValue ?? 0.0,
+                cya: log.cya?.doubleValue ?? 0.0,
+                saltPpm: log.saltPpm?.doubleValue ?? 0.0,
                 notes: log.notes
             )
         }

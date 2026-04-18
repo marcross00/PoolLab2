@@ -54,9 +54,10 @@ struct CustomAnalyticsView: View {
     }
     
     private func convertToChartData(_ logs: [PoolLog]) -> [ChartDataPoint] {
-        logs.compactMap { log in
-            guard let date = log.date else { return nil }
-            return ChartDataPoint(date: date, value: log.ph)
+        logs.compactMap { log -> ChartDataPoint? in
+            guard let date = log.date,
+                  let phValue = log.ph as? Double else { return nil }
+            return ChartDataPoint(date: date, value: phValue)
         }
     }
 }
@@ -115,12 +116,12 @@ func analyzeTrend(for logs: [PoolLog], metric: ChemistryMetric) -> TrendAnalysis
     
     let values = logs.compactMap { log -> Double? in
         switch metric {
-        case .ph: return log.ph
-        case .freeChlorine: return log.fc
-        case .totalAlkalinity: return log.ta
-        case .calciumHardness: return log.ch
-        case .cya: return log.cya
-        case .salt: return log.saltPpm
+        case .ph: return log.ph as? Double
+        case .freeChlorine: return log.fc as? Double
+        case .totalAlkalinity: return log.ta as? Double
+        case .calciumHardness: return log.ch as? Double
+        case .cya: return log.cya as? Double
+        case .salt: return log.saltPpm as? Double
         }
     }
     
@@ -162,12 +163,24 @@ func exportChartData(
         
         let value: Double
         switch metric {
-        case .ph: value = log.ph
-        case .freeChlorine: value = log.fc
-        case .totalAlkalinity: value = log.ta
-        case .calciumHardness: value = log.ch
-        case .cya: value = log.cya
-        case .salt: value = log.saltPpm
+        case .ph: 
+            guard let v = log.ph as? Double else { continue }
+            value = v
+        case .freeChlorine: 
+            guard let v = log.fc as? Double else { continue }
+            value = v
+        case .totalAlkalinity: 
+            guard let v = log.ta as? Double else { continue }
+            value = v
+        case .calciumHardness: 
+            guard let v = log.ch as? Double else { continue }
+            value = v
+        case .cya: 
+            guard let v = log.cya as? Double else { continue }
+            value = v
+        case .salt: 
+            guard let v = log.saltPpm as? Double else { continue }
+            value = v
         }
         
         let dateString = dateFormatter.string(from: date)
@@ -208,12 +221,12 @@ func generateSummaryReport(
     let metrics: [PoolSummaryReport.MetricSummary] = ChemistryMetric.allCases.map { metric in
         let values = logs.compactMap { log -> Double? in
             switch metric {
-            case .ph: return log.ph
-            case .freeChlorine: return log.fc
-            case .totalAlkalinity: return log.ta
-            case .calciumHardness: return log.ch
-            case .cya: return log.cya
-            case .salt: return log.saltPpm
+            case .ph: return log.ph as? Double
+            case .freeChlorine: return log.fc as? Double
+            case .totalAlkalinity: return log.ta as? Double
+            case .calciumHardness: return log.ch as? Double
+            case .cya: return log.cya as? Double
+            case .salt: return log.saltPpm as? Double
             }
         }
         
@@ -333,21 +346,25 @@ func checkForAlerts(logs: [PoolLog]) -> [PoolAlert] {
     guard let latestLog = logs.first else { return alerts }
     
     // Check pH
-    if latestLog.ph < 7.0 || latestLog.ph > 7.8 {
-        alerts.append(PoolAlert(
-            metric: .ph,
-            value: latestLog.ph,
-            message: "pH is out of ideal range (7.2-7.6)"
-        ))
+    if let phValue = latestLog.ph as? Double {
+        if phValue < 7.0 || phValue > 7.8 {
+            alerts.append(PoolAlert(
+                metric: .ph,
+                value: phValue,
+                message: "pH is out of ideal range (7.2-7.6)"
+            ))
+        }
     }
     
     // Check Free Chlorine
-    if latestLog.fc < 1.0 || latestLog.fc > 5.0 {
-        alerts.append(PoolAlert(
-            metric: .freeChlorine,
-            value: latestLog.fc,
-            message: "Free Chlorine is out of ideal range (2.0-4.0 ppm)"
-        ))
+    if let fcValue = latestLog.fc as? Double {
+        if fcValue < 1.0 || fcValue > 5.0 {
+            alerts.append(PoolAlert(
+                metric: .freeChlorine,
+                value: fcValue,
+                message: "Free Chlorine is out of ideal range (2.0-4.0 ppm)"
+            ))
+        }
     }
     
     return alerts

@@ -209,43 +209,43 @@ struct DataCleanup {
             var needsSave = false
             
             // Clamp pH to valid range
-            if log.ph < 0 || log.ph > 14 {
-                log.ph = log.ph.clamped(to: 0...14)
+            if let phValue = log.phValue, (phValue < 0 || phValue > 14) {
+                log.ph = NSNumber(value: phValue.clamped(to: 0...14))
                 needsSave = true
                 fixed += 1
             }
             
             // Clamp FC
-            if log.fc < 0 {
-                log.fc = 0
+            if let fcValue = log.fcValue, fcValue < 0 {
+                log.fc = NSNumber(value: 0)
                 needsSave = true
                 fixed += 1
             }
             
             // Clamp TA
-            if log.ta < 0 {
-                log.ta = 0
+            if let taValue = log.taValue, taValue < 0 {
+                log.ta = NSNumber(value: 0)
                 needsSave = true
                 fixed += 1
             }
             
             // Clamp CH
-            if log.ch < 0 {
-                log.ch = 0
+            if let chValue = log.chValue, chValue < 0 {
+                log.ch = NSNumber(value: 0)
                 needsSave = true
                 fixed += 1
             }
             
             // Clamp CYA
-            if log.cya < 0 {
-                log.cya = 0
+            if let cyaValue = log.cyaValue, cyaValue < 0 {
+                log.cya = NSNumber(value: 0)
                 needsSave = true
                 fixed += 1
             }
             
             // Clamp Salt
-            if log.saltPpm < 0 {
-                log.saltPpm = 0
+            if let saltValue = log.saltPpmValue, saltValue < 0 {
+                log.saltPpm = NSNumber(value: 0)
                 needsSave = true
                 fixed += 1
             }
@@ -267,7 +267,11 @@ struct DataCleanup {
         dateFormatter.dateFormat = "yyyy-MM-dd-HH-mm"
         let dateString = log.date.map { dateFormatter.string(from: $0) } ?? "no-date"
         
-        return "\(dateString)-\(log.ph)-\(log.fc)-\(log.ta)"
+        let phString = log.phValue.map { String($0) } ?? "nil"
+        let fcString = log.fcValue.map { String($0) } ?? "nil"
+        let taString = log.taValue.map { String($0) } ?? "nil"
+        
+        return "\(dateString)-\(phString)-\(fcString)-\(taString)"
     }
 }
 
@@ -282,8 +286,8 @@ struct DataStatistics {
         let tasks = try context.fetch(MaintenanceTask.fetchRequest() as NSFetchRequest<MaintenanceTask>)
         
         // Pool log statistics
-        let phValues = poolLogs.map { $0.ph }
-        let fcValues = poolLogs.map { $0.fc }
+        let phValues = poolLogs.compactMap { $0.phValue }
+        let fcValues = poolLogs.compactMap { $0.fcValue }
         
         let dates = poolLogs.compactMap { $0.date }
         let oldestDate = dates.min()

@@ -75,11 +75,11 @@ private struct LogRowView: View {
             Text(log.wrappedDate, formatter: Self.dateFormatter)
                 .font(.headline)
             HStack(spacing: 16) {
-                Label(String(format: "%.1f", log.ph), systemImage: "drop.fill")
+                Label(log.phValue.formatted(with: "%.1f"), systemImage: "drop.fill")
                     .foregroundStyle(.blue)
-                Label(String(format: "%.1f", log.fc), systemImage: "bubbles.and.sparkles")
+                Label(log.fcValue.formatted(with: "%.1f"), systemImage: "bubbles.and.sparkles")
                     .foregroundStyle(.orange)
-                Label(String(format: "%.0f", log.saltPpm), systemImage: "cube.fill")
+                Label(log.saltPpmValue.formatted(with: "%.0f"), systemImage: "cube.fill")
                     .foregroundStyle(.gray)
             }
             .font(.subheadline)

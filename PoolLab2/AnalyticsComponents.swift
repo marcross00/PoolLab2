@@ -9,8 +9,8 @@ internal import CoreData
 
 struct MetricCard: View {
     let metric: ChemistryMetric
-    let currentValue: Double
-    let average: Double
+    let currentValue: Double?
+    let average: Double?
     let trend: TrendIndicator
     
     enum TrendIndicator {
@@ -42,9 +42,11 @@ struct MetricCard: View {
                 
                 Spacer()
                 
-                Image(systemName: trend.icon)
-                    .font(.caption)
-                    .foregroundStyle(trend.color)
+                if currentValue != nil {
+                    Image(systemName: trend.icon)
+                        .font(.caption)
+                        .foregroundStyle(trend.color)
+                }
             }
             
             Text(metric.displayName)
@@ -52,22 +54,34 @@ struct MetricCard: View {
                 .foregroundStyle(.secondary)
             
             HStack(alignment: .firstTextBaseline, spacing: 4) {
-                Text("\(currentValue, specifier: "%.1f")")
-                    .font(.title2)
-                    .fontWeight(.semibold)
-                
-                Text(metric.unit)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                if let value = currentValue {
+                    Text("\(value, specifier: "%.1f")")
+                        .font(.title2)
+                        .fontWeight(.semibold)
+                    
+                    Text(metric.unit)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text("--")
+                        .font(.title2)
+                        .foregroundStyle(.tertiary)
+                }
             }
             
             HStack(spacing: 4) {
                 Text("Avg:")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                Text("\(average, specifier: "%.1f")")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                if let avg = average {
+                    Text("\(avg, specifier: "%.1f")")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text("--")
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
+                }
             }
         }
         .padding()
@@ -134,40 +148,40 @@ struct CompactAnalyticsView: View {
         }
     }
     
-    private func currentValue(for metric: ChemistryMetric) -> Double {
-        guard let latest = logs.first else { return 0 }
+    private func currentValue(for metric: ChemistryMetric) -> Double? {
+        guard let latest = logs.first else { return nil }
         
         switch metric {
-        case .ph: return latest.ph
-        case .freeChlorine: return latest.fc
-        case .totalAlkalinity: return latest.ta
-        case .calciumHardness: return latest.ch
-        case .cya: return latest.cya
-        case .salt: return latest.saltPpm
+        case .ph: return latest.phValue
+        case .freeChlorine: return latest.fcValue
+        case .totalAlkalinity: return latest.taValue
+        case .calciumHardness: return latest.chValue
+        case .cya: return latest.cyaValue
+        case .salt: return latest.saltPpmValue
         }
     }
     
-    private func averageValue(for metric: ChemistryMetric) -> Double {
-        let values = logs.map { log in
+    private func averageValue(for metric: ChemistryMetric) -> Double? {
+        let values = logs.compactMap { log -> Double? in
             switch metric {
-            case .ph: return log.ph
-            case .freeChlorine: return log.fc
-            case .totalAlkalinity: return log.ta
-            case .calciumHardness: return log.ch
-            case .cya: return log.cya
-            case .salt: return log.saltPpm
+            case .ph: return log.phValue
+            case .freeChlorine: return log.fcValue
+            case .totalAlkalinity: return log.taValue
+            case .calciumHardness: return log.chValue
+            case .cya: return log.cyaValue
+            case .salt: return log.saltPpmValue
             }
         }
         
-        guard !values.isEmpty else { return 0 }
+        guard !values.isEmpty else { return nil }
         return values.reduce(0, +) / Double(values.count)
     }
     
     private func trendFor(_ metric: ChemistryMetric) -> MetricCard.TrendIndicator {
-        guard logs.count >= 2 else { return .stable }
-        
-        let current = currentValue(for: metric)
-        let previous = previousValue(for: metric)
+        guard logs.count >= 2,
+              let current = currentValue(for: metric),
+              let previous = previousValue(for: metric),
+              previous != 0 else { return .stable }
         
         let change = ((current - previous) / previous) * 100
         
@@ -180,17 +194,17 @@ struct CompactAnalyticsView: View {
         }
     }
     
-    private func previousValue(for metric: ChemistryMetric) -> Double {
-        guard logs.count >= 2 else { return 0 }
+    private func previousValue(for metric: ChemistryMetric) -> Double? {
+        guard logs.count >= 2 else { return nil }
         let previous = logs[1]
         
         switch metric {
-        case .ph: return previous.ph
-        case .freeChlorine: return previous.fc
-        case .totalAlkalinity: return previous.ta
-        case .calciumHardness: return previous.ch
-        case .cya: return previous.cya
-        case .salt: return previous.saltPpm
+        case .ph: return previous.phValue
+        case .freeChlorine: return previous.fcValue
+        case .totalAlkalinity: return previous.taValue
+        case .calciumHardness: return previous.chValue
+        case .cya: return previous.cyaValue
+        case .salt: return previous.saltPpmValue
         }
     }
     
@@ -198,17 +212,18 @@ struct CompactAnalyticsView: View {
         logs.compactMap { log in
             guard let date = log.date else { return nil }
             
-            let value: Double
+            let value: Double?
             switch metric {
-            case .ph: value = log.ph
-            case .freeChlorine: value = log.fc
-            case .totalAlkalinity: value = log.ta
-            case .calciumHardness: value = log.ch
-            case .cya: value = log.cya
-            case .salt: value = log.saltPpm
+            case .ph: value = log.phValue
+            case .freeChlorine: value = log.fcValue
+            case .totalAlkalinity: value = log.taValue
+            case .calciumHardness: value = log.chValue
+            case .cya: value = log.cyaValue
+            case .salt: value = log.saltPpmValue
             }
             
-            return ChartDataPoint(date: date, value: value)
+            guard let unwrappedValue = value else { return nil }
+            return ChartDataPoint(date: date, value: unwrappedValue)
         }
     }
 }
@@ -241,11 +256,13 @@ struct DashboardAnalyticsView: View {
                 
                 Chart {
                     ForEach(recentLogs, id: \.id) { log in
-                        LineMark(
-                            x: .value("Date", log.date ?? Date()),
-                            y: .value("pH", log.ph)
-                        )
-                        .foregroundStyle(.blue.gradient)
+                        if let date = log.date, let ph = log.phValue {
+                            LineMark(
+                                x: .value("Date", date),
+                                y: .value("pH", ph)
+                            )
+                            .foregroundStyle(.blue.gradient)
+                        }
                     }
                 }
                 .frame(height: 80)
@@ -264,23 +281,23 @@ struct DashboardAnalyticsView: View {
     }
     
     private var latestPH: String {
-        guard let latest = logs.first else { return "--" }
-        return String(format: "%.1f", latest.ph)
+        guard let latest = logs.first, let ph = latest.phValue else { return "--" }
+        return String(format: "%.1f", ph)
     }
     
     private var latestFC: String {
-        guard let latest = logs.first else { return "--" }
-        return String(format: "%.1f", latest.fc)
+        guard let latest = logs.first, let fc = latest.fcValue else { return "--" }
+        return String(format: "%.1f", fc)
     }
     
     private var phInRange: Bool {
-        guard let latest = logs.first else { return false }
-        return (7.2...7.6).contains(latest.ph)
+        guard let latest = logs.first, let ph = latest.phValue else { return false }
+        return (7.2...7.6).contains(ph)
     }
     
     private var fcInRange: Bool {
-        guard let latest = logs.first else { return false }
-        return (2.0...4.0).contains(latest.fc)
+        guard let latest = logs.first, let fc = latest.fcValue else { return false }
+        return (2.0...4.0).contains(fc)
     }
     
     private var poolStatus: PoolStatus {
@@ -394,12 +411,12 @@ struct QuickMetric: View {
         let log = PoolLog(context: context)
         log.id = UUID()
         log.date = Calendar.current.date(byAdding: .day, value: -i, to: Date())
-        log.ph = 7.2 + Double.random(in: -0.2...0.2)
-        log.fc = 3.0 + Double.random(in: -1.0...1.0)
-        log.ta = 90 + Double.random(in: -10...10)
-        log.ch = 250
-        log.cya = 35
-        log.saltPpm = 3200
+        log.ph = NSNumber(value: 7.2 + Double.random(in: -0.2...0.2))
+        log.fc = NSNumber(value: 3.0 + Double.random(in: -1.0...1.0))
+        log.ta = NSNumber(value: 90 + Double.random(in: -10...10))
+        log.ch = NSNumber(value: 250)
+        log.cya = NSNumber(value: 35)
+        log.saltPpm = NSNumber(value: 3200)
         return log
     }
     
@@ -416,12 +433,12 @@ struct QuickMetric: View {
         let log = PoolLog(context: context)
         log.id = UUID()
         log.date = Calendar.current.date(byAdding: .day, value: -i, to: Date())
-        log.ph = 7.3 + Double.random(in: -0.1...0.1)
-        log.fc = 3.0 + Double.random(in: -0.5...0.5)
-        log.ta = 90
-        log.ch = 250
-        log.cya = 35
-        log.saltPpm = 3200
+        log.ph = NSNumber(value: 7.3 + Double.random(in: -0.1...0.1))
+        log.fc = NSNumber(value: 3.0 + Double.random(in: -0.5...0.5))
+        log.ta = NSNumber(value: 90)
+        log.ch = NSNumber(value: 250)
+        log.cya = NSNumber(value: 35)
+        log.saltPpm = NSNumber(value: 3200)
         return log
     }
     

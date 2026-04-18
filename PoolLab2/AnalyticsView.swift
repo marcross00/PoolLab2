@@ -251,12 +251,12 @@ private struct StatLabel: View {
         let log = PoolLog(context: context)
         log.id = UUID()
         log.date = Calendar.current.date(byAdding: .day, value: -i, to: Date())
-        log.ph = 7.2 + Double.random(in: -0.3...0.3)
-        log.fc = 3.0 + Double.random(in: -1.0...1.0)
-        log.ta = 80 + Double.random(in: -10...10)
-        log.ch = 250 + Double.random(in: -20...20)
-        log.cya = 30 + Double.random(in: -5...5)
-        log.saltPpm = 3200 + Double.random(in: -200...200)
+        log.ph = NSNumber(value: 7.2 + Double.random(in: -0.3...0.3))
+        log.fc = NSNumber(value: 3.0 + Double.random(in: -1.0...1.0))
+        log.ta = NSNumber(value: 80 + Double.random(in: -10...10))
+        log.ch = NSNumber(value: 250 + Double.random(in: -20...20))
+        log.cya = NSNumber(value: 30 + Double.random(in: -5...5))
+        log.saltPpm = NSNumber(value: 3200 + Double.random(in: -200...200))
         
         if i % 3 == 0 {
             let chemical = ChemicalEntry(context: context)

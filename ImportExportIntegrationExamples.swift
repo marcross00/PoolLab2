@@ -155,16 +155,12 @@ struct LogsViewWithExportButton: View {
     private func exportCurrentLogs() {
         let exportManager = DataExportManager(context: context)
         
-        Task {
-            do {
-                let data = try await exportManager.exportPoolLogsToCSV()
-                await MainActor.run {
-                    exportData = data
-                    showingShareSheet = true
-                }
-            } catch {
-                print("Export failed: \(error)")
-            }
+        do {
+            let data = try exportManager.exportPoolLogsToCSV()
+            exportData = data
+            showingShareSheet = true
+        } catch {
+            print("Export failed: \(error)")
         }
     }
     
@@ -193,8 +189,19 @@ struct LogDetailWithExport: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 // Log details
-                Text("pH: \(log.ph, specifier: "%.1f")")
-                Text("FC: \(log.fc, specifier: "%.1f") ppm")
+                Group {
+                    if let ph = log.phValue {
+                        Text("pH: \(ph, specifier: "%.1f")")
+                    } else {
+                        Text("pH: --")
+                    }
+                    
+                    if let fc = log.fcValue {
+                        Text("FC: \(fc, specifier: "%.1f") ppm")
+                    } else {
+                        Text("FC: --")
+                    }
+                }
                 // ... more details
             }
             .padding()
@@ -221,12 +228,12 @@ struct LogDetailWithExport: View {
         let exportable = PoolLogExportable(
             id: log.id ?? UUID(),
             date: log.date ?? Date(),
-            ph: log.ph,
-            fc: log.fc,
-            ta: log.ta,
-            ch: log.ch,
-            cya: log.cya,
-            saltPpm: log.saltPpm,
+            ph: log.phValue ?? 0.0,
+            fc: log.fcValue ?? 0.0,
+            ta: log.taValue ?? 0.0,
+            ch: log.chValue ?? 0.0,
+            cya: log.cyaValue ?? 0.0,
+            saltPpm: log.saltPpmValue ?? 0.0,
             notes: log.notes
         )
         
@@ -305,9 +312,15 @@ struct LatestReadingsCard: View {
                     Text("pH")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    Text("\(log.ph, specifier: "%.1f")")
-                        .font(.title2)
-                        .fontWeight(.semibold)
+                    if let ph = log.phValue {
+                        Text("\(ph, specifier: "%.1f")")
+                            .font(.title2)
+                            .fontWeight(.semibold)
+                    } else {
+                        Text("--")
+                            .font(.title2)
+                            .foregroundStyle(.tertiary)
+                    }
                 }
                 
                 Spacer()
@@ -316,9 +329,15 @@ struct LatestReadingsCard: View {
                     Text("FC")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    Text("\(log.fc, specifier: "%.1f") ppm")
-                        .font(.title2)
-                        .fontWeight(.semibold)
+                    if let fc = log.fcValue {
+                        Text("\(fc, specifier: "%.1f") ppm")
+                            .font(.title2)
+                            .fontWeight(.semibold)
+                    } else {
+                        Text("--")
+                            .font(.title2)
+                            .foregroundStyle(.tertiary)
+                    }
                 }
             }
         }
@@ -434,9 +453,19 @@ struct PoolLogRow: View {
                 .font(.headline)
             
             HStack {
-                Text("pH: \(log.ph, specifier: "%.1f")")
+                if let ph = log.phValue {
+                    Text("pH: \(ph, specifier: "%.1f")")
+                } else {
+                    Text("pH: --")
+                }
+                
                 Spacer()
-                Text("FC: \(log.fc, specifier: "%.1f")")
+                
+                if let fc = log.fcValue {
+                    Text("FC: \(fc, specifier: "%.1f")")
+                } else {
+                    Text("FC: --")
+                }
             }
             .font(.subheadline)
             .foregroundStyle(.secondary)

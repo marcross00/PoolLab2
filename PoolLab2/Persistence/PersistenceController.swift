@@ -13,12 +13,12 @@ struct PersistenceController {
             let log = PoolLog(context: context)
             log.id = UUID()
             log.date = Calendar.current.date(byAdding: .day, value: -i, to: Date())!
-            log.ph = 7.2 + Double(i) * 0.1
-            log.fc = 3.0 + Double(i) * 0.5
-            log.ta = 80 + Double(i) * 5
-            log.ch = 250 + Double(i) * 10
-            log.cya = 30 + Double(i) * 2
-            log.saltPpm = 3200 + Double(i) * 50
+            log.ph = NSNumber(value: 7.2 + Double(i) * 0.1)
+            log.fc = NSNumber(value: 3.0 + Double(i) * 0.5)
+            log.ta = NSNumber(value: 80 + Double(i) * 5)
+            log.ch = NSNumber(value: 250 + Double(i) * 10)
+            log.cya = NSNumber(value: 30 + Double(i) * 2)
+            log.saltPpm = NSNumber(value: 3200 + Double(i) * 50)
 
             let chemical = ChemicalEntry(context: context)
             chemical.id = UUID()
@@ -128,32 +128,32 @@ struct PersistenceController {
         let poolLogPh = NSAttributeDescription()
         poolLogPh.name = "ph"
         poolLogPh.attributeType = .doubleAttributeType
-        poolLogPh.defaultValue = 0.0
+        poolLogPh.isOptional = true
 
         let poolLogFc = NSAttributeDescription()
         poolLogFc.name = "fc"
         poolLogFc.attributeType = .doubleAttributeType
-        poolLogFc.defaultValue = 0.0
+        poolLogFc.isOptional = true
 
         let poolLogTa = NSAttributeDescription()
         poolLogTa.name = "ta"
         poolLogTa.attributeType = .doubleAttributeType
-        poolLogTa.defaultValue = 0.0
+        poolLogTa.isOptional = true
 
         let poolLogCh = NSAttributeDescription()
         poolLogCh.name = "ch"
         poolLogCh.attributeType = .doubleAttributeType
-        poolLogCh.defaultValue = 0.0
+        poolLogCh.isOptional = true
 
         let poolLogCya = NSAttributeDescription()
         poolLogCya.name = "cya"
         poolLogCya.attributeType = .doubleAttributeType
-        poolLogCya.defaultValue = 0.0
+        poolLogCya.isOptional = true
 
         let poolLogSalt = NSAttributeDescription()
         poolLogSalt.name = "saltPpm"
         poolLogSalt.attributeType = .doubleAttributeType
-        poolLogSalt.defaultValue = 0.0
+        poolLogSalt.isOptional = true
 
         let poolLogNotes = NSAttributeDescription()
         poolLogNotes.name = "notes"
