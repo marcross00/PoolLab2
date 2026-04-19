@@ -209,7 +209,7 @@ struct CompactAnalyticsView: View {
     }
     
     private func chartData(for metric: ChemistryMetric) -> [ChartDataPoint] {
-        logs.compactMap { log in
+        logs.compactMap { log -> ChartDataPoint? in
             guard let date = log.date else { return nil }
             
             let value: Double?
@@ -223,7 +223,13 @@ struct CompactAnalyticsView: View {
             }
             
             guard let unwrappedValue = value else { return nil }
-            return ChartDataPoint(date: date, value: unwrappedValue)
+            
+            // Check if acid was added during this log entry
+            let acidAdded = log.chemicalsArray.contains { chemical in
+                chemical.type?.lowercased() == "acid"
+            }
+            
+            return ChartDataPoint(date: date, value: unwrappedValue, acidAdded: acidAdded)
         }
     }
 }

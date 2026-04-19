@@ -3,9 +3,9 @@ internal import CoreData
 
 struct ChemicalRow: Identifiable {
     let id = UUID()
-    var type: String = "chlorine"
+    var type: String = "acid"
     var amount: String = ""
-    var unit: String = "oz"
+    var unit: String = "ml"
 }
 
 @Observable

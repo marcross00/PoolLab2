@@ -89,6 +89,19 @@ struct AnalyticsView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     }
+                    
+                    // Add legend for pH chart showing acid additions
+                    if viewModel.selectedMetric == .ph && viewModel.chartData.contains(where: { $0.acidAdded }) {
+                        HStack(spacing: 4) {
+                            Circle()
+                                .fill(.red)
+                                .frame(width: 8, height: 8)
+                            Text("Acid added")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+                        .padding(.top, 4)
+                    }
                 }
                 
                 Spacer()
@@ -107,7 +120,7 @@ struct AnalyticsView: View {
                         x: .value("Date", dataPoint.date, unit: .day),
                         y: .value(viewModel.selectedMetric.displayName, dataPoint.value)
                     )
-                    .foregroundStyle(viewModel.selectedMetric.color)
+                    .foregroundStyle(pointColor(for: dataPoint))
                     .symbolSize(50)
                 }
                 
@@ -221,6 +234,16 @@ struct AnalyticsView: View {
         .frame(maxWidth: .infinity)
         .background(Color(.systemBackground))
         .cornerRadius(12)
+    }
+    
+    // Helper function to determine point color
+    private func pointColor(for dataPoint: ChartDataPoint) -> Color {
+        // Show red points for pH chart when acid was added
+        if viewModel.selectedMetric == .ph && dataPoint.acidAdded {
+            return .red
+        }
+        // Otherwise use the metric's default color
+        return viewModel.selectedMetric.color
     }
 }
 

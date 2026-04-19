@@ -56,8 +56,14 @@ struct CustomAnalyticsView: View {
     private func convertToChartData(_ logs: [PoolLog]) -> [ChartDataPoint] {
         logs.compactMap { log -> ChartDataPoint? in
             guard let date = log.date,
-                  let phValue = log.ph as? Double else { return nil }
-            return ChartDataPoint(date: date, value: phValue)
+                  let phValue = log.phValue else { return nil }
+            
+            // Check if acid was added during this log entry
+            let acidAdded = log.chemicalsArray.contains { chemical in
+                chemical.type?.lowercased() == "acid"
+            }
+            
+            return ChartDataPoint(date: date, value: phValue, acidAdded: acidAdded)
         }
     }
 }

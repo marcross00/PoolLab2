@@ -103,7 +103,7 @@ struct ComparisonChartView: View {
     }
     
     private func chartData(for metric: ChemistryMetric) -> [ChartDataPoint] {
-        logs.compactMap { log in
+        logs.compactMap { log -> ChartDataPoint? in
             guard let date = log.date else { return nil }
             
             let value: Double?
@@ -117,7 +117,7 @@ struct ComparisonChartView: View {
             }
             
             guard let unwrappedValue = value else { return nil }
-            return ChartDataPoint(date: date, value: unwrappedValue)
+            return ChartDataPoint(date: date, value: unwrappedValue, acidAdded: false)
         }
     }
     
@@ -144,13 +144,13 @@ struct ComparisonChartView: View {
     VStack {
         TrendChartView(
             data: [
-                ChartDataPoint(date: Date().addingTimeInterval(-86400 * 6), value: 7.2),
-                ChartDataPoint(date: Date().addingTimeInterval(-86400 * 5), value: 7.4),
-                ChartDataPoint(date: Date().addingTimeInterval(-86400 * 4), value: 7.1),
-                ChartDataPoint(date: Date().addingTimeInterval(-86400 * 3), value: 7.3),
-                ChartDataPoint(date: Date().addingTimeInterval(-86400 * 2), value: 7.5),
-                ChartDataPoint(date: Date().addingTimeInterval(-86400 * 1), value: 7.2),
-                ChartDataPoint(date: Date(), value: 7.4)
+                ChartDataPoint(date: Date().addingTimeInterval(-86400 * 6), value: 7.2, acidAdded: false),
+                ChartDataPoint(date: Date().addingTimeInterval(-86400 * 5), value: 7.4, acidAdded: false),
+                ChartDataPoint(date: Date().addingTimeInterval(-86400 * 4), value: 7.1, acidAdded: true),
+                ChartDataPoint(date: Date().addingTimeInterval(-86400 * 3), value: 7.3, acidAdded: false),
+                ChartDataPoint(date: Date().addingTimeInterval(-86400 * 2), value: 7.5, acidAdded: false),
+                ChartDataPoint(date: Date().addingTimeInterval(-86400 * 1), value: 7.2, acidAdded: true),
+                ChartDataPoint(date: Date(), value: 7.4, acidAdded: false)
             ],
             metric: .ph
         )

@@ -129,7 +129,13 @@ class AnalyticsViewModel: ObservableObject {
             }
             
             guard let unwrappedValue = value else { return nil }
-            return ChartDataPoint(date: date, value: unwrappedValue)
+            
+            // Check if acid was added during this log entry
+            let acidAdded = log.chemicalsArray.contains { chemical in
+                chemical.type?.lowercased() == "acid"
+            }
+            
+            return ChartDataPoint(date: date, value: unwrappedValue, acidAdded: acidAdded)
         }
     }
     
@@ -297,6 +303,7 @@ enum ChemicalType: String, CaseIterable {
 struct ChartDataPoint {
     let date: Date
     let value: Double
+    let acidAdded: Bool
 }
 
 struct ChemicalUsageData: Identifiable {
