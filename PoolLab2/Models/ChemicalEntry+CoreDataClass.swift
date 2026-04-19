@@ -4,11 +4,11 @@ public import CoreData
 @objc(ChemicalEntry)
 public class ChemicalEntry: NSManagedObject, Identifiable {
     @NSManaged public var id: UUID?
-    @NSManaged public var date: Date?
-    @NSManaged public var type: String?
-    @NSManaged public var amount: Double
-    @NSManaged public var unit: String?
-    @NSManaged public var poolLog: PoolLog?
+    @NSManaged @objc dynamic public var date: Date?
+    @NSManaged @objc dynamic public var type: String?
+    @NSManaged @objc dynamic public var amount: Double
+    @NSManaged @objc dynamic public var unit: String?
+    @NSManaged @objc dynamic public var poolLog: PoolLog?
 
     public var wrappedType: String {
         type ?? "other"

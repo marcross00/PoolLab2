@@ -3,15 +3,15 @@ public import CoreData
 @objc(PoolLog)
 public class PoolLog: NSManagedObject, Identifiable {
     @NSManaged public var id: UUID?
-    @NSManaged public var date: Date?
-    @NSManaged public var ph: NSNumber?
-    @NSManaged public var fc: NSNumber?
-    @NSManaged public var ta: NSNumber?
-    @NSManaged public var ch: NSNumber?
-    @NSManaged public var cya: NSNumber?
-    @NSManaged public var saltPpm: NSNumber?
-    @NSManaged public var notes: String?
-    @NSManaged public var chemicals: NSSet?
+    @NSManaged @objc dynamic public var date: Date?
+    @NSManaged @objc dynamic public var ph: NSNumber?
+    @NSManaged @objc dynamic public var fc: NSNumber?
+    @NSManaged @objc dynamic public var ta: NSNumber?
+    @NSManaged @objc dynamic public var ch: NSNumber?
+    @NSManaged @objc dynamic public var cya: NSNumber?
+    @NSManaged @objc dynamic public var saltPpm: NSNumber?
+    @NSManaged @objc dynamic public var notes: String?
+    @NSManaged @objc dynamic public var chemicals: NSSet?
 
     public var chemicalsArray: [ChemicalEntry] {
         let set = chemicals as? Set<ChemicalEntry> ?? []

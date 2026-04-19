@@ -185,7 +185,7 @@ struct LogListView: View {
 }
 
 private struct LogRowView: View {
-    let log: PoolLog
+    @ObservedObject var log: PoolLog
 
     private static let dateFormatter: DateFormatter = {
         let f = DateFormatter()

@@ -2,7 +2,7 @@ import SwiftUI
 internal import CoreData
 
 struct LogDetailView: View {
-    let log: PoolLog
+    @ObservedObject var log: PoolLog
     
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
