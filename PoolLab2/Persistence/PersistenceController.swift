@@ -33,21 +33,27 @@ struct PersistenceController {
         let task1 = MaintenanceTask(context: context)
         task1.id = UUID()
         task1.name = "Check pH"
-        task1.intervalDays = 3
+        task1.intervalValue = 3
+        task1.intervalUnit = "day"
+        task1.intervalDays = 3  // Keep for backwards compatibility
         task1.lastCompletedDate = Calendar.current.date(byAdding: .day, value: -4, to: Date())!
         task1.isEnabled = true
         
         let task2 = MaintenanceTask(context: context)
         task2.id = UUID()
         task2.name = "Check Total Alkalinity"
-        task2.intervalDays = 14
+        task2.intervalValue = 2
+        task2.intervalUnit = "week"
+        task2.intervalDays = 14  // Keep for backwards compatibility
         task2.lastCompletedDate = Calendar.current.date(byAdding: .day, value: -14, to: Date())!
         task2.isEnabled = true
         
         let task3 = MaintenanceTask(context: context)
         task3.id = UUID()
         task3.name = "Check CYA"
-        task3.intervalDays = 30
+        task3.intervalValue = 1
+        task3.intervalUnit = "month"
+        task3.intervalDays = 30  // Keep for backwards compatibility
         task3.lastCompletedDate = Date()
         task3.isEnabled = false
         task3.notes = "Check at the beginning of each season"
@@ -94,6 +100,16 @@ struct PersistenceController {
         taskInterval.attributeType = .integer16AttributeType
         taskInterval.defaultValue = 7
         
+        let taskIntervalValue = NSAttributeDescription()
+        taskIntervalValue.name = "intervalValue"
+        taskIntervalValue.attributeType = .integer16AttributeType
+        taskIntervalValue.defaultValue = 1
+        
+        let taskIntervalUnit = NSAttributeDescription()
+        taskIntervalUnit.name = "intervalUnit"
+        taskIntervalUnit.attributeType = .stringAttributeType
+        taskIntervalUnit.defaultValue = "day"
+        
         let taskLastCompleted = NSAttributeDescription()
         taskLastCompleted.name = "lastCompletedDate"
         taskLastCompleted.attributeType = .dateAttributeType
@@ -109,7 +125,8 @@ struct PersistenceController {
         taskNotes.isOptional = true
         
         taskEntity.properties = [
-            taskId, taskName, taskInterval, taskLastCompleted, taskEnabled, taskNotes
+            taskId, taskName, taskInterval, taskIntervalValue, taskIntervalUnit, 
+            taskLastCompleted, taskEnabled, taskNotes
         ]
 
         // PoolLog entity

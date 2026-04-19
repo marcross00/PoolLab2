@@ -4,10 +4,10 @@ internal import CoreData
 struct AddEditTaskView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
-    @StateObject private var viewModel: AddEditTaskViewModel
+    @State private var viewModel: AddEditTaskViewModel
     
     init(task: MaintenanceTask? = nil) {
-        _viewModel = StateObject(wrappedValue: AddEditTaskViewModel(task: task))
+        _viewModel = State(wrappedValue: AddEditTaskViewModel(task: task))
     }
     
     var body: some View {
@@ -16,14 +16,33 @@ struct AddEditTaskView: View {
                 TextField("Task Name", text: $viewModel.name)
                     .autocorrectionDisabled()
                 
-                Stepper(value: $viewModel.intervalDays, in: 1...365) {
-                    HStack {
-                        Text("Interval")
-                        Spacer()
-                        Text("\(viewModel.intervalDays) day\(viewModel.intervalDays == 1 ? "" : "s")")
-                            .foregroundStyle(.secondary)
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Repeat Interval")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                    
+                    HStack(spacing: 12) {
+                        Stepper(value: $viewModel.intervalValue, in: 1...999) {
+                            Text("\(viewModel.intervalValue)")
+                                .font(.title2.monospacedDigit())
+                                .frame(minWidth: 50, alignment: .leading)
+                        }
+                        
+                        Picker("Unit", selection: $viewModel.intervalUnit) {
+                            ForEach(MaintenanceTask.IntervalUnit.allCases, id: \.self) { unit in
+                                Label(unit.displayName(count: viewModel.intervalValue), 
+                                      systemImage: unit.icon)
+                                    .tag(unit)
+                            }
+                        }
+                        .pickerStyle(.segmented)
                     }
+                    
+                    Text(viewModel.intervalDescription)
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
                 }
+                .padding(.vertical, 4)
             }
             
             Section("Scheduling") {
@@ -103,7 +122,9 @@ struct AddEditTaskView: View {
     let task = MaintenanceTask(context: context)
     task.id = UUID()
     task.name = "Check pH"
-    task.intervalDays = 3
+    task.intervalValue = 1
+    task.intervalUnit = "week"
+    task.intervalDays = 7  // Keep for backwards compatibility
     task.lastCompletedDate = Date()
     task.isEnabled = true
     task.notes = "Test weekly"
